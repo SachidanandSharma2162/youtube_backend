@@ -300,3 +300,82 @@ module.exports.updateAvatar = asyncHandler(async (req, res) => {
       res.status(500).send("Something went wrong while updating avatar, try again later!");
     }
 });
+
+module.exports.getUserChannelProfile=asyncHandler(async(req,res)=>{
+    try {
+        let {username}=req.params
+        if(!username){
+            res.status(400)
+            .json({
+            message:"username is missing!"
+            })
+        }
+        const channel=await userModel.aggregate([
+            {
+                $match:{
+                    userName:username?.toLowerCase()
+                }
+            },
+            {
+                $lookup:{
+                    // to get who followed username
+                    from:"Subscriber",
+                    localField:"_id",
+                    foreignField:"channel",
+                    as:"subscribers"
+                }
+            },
+            {
+                $lookup:{
+                    // to get whom username is following
+                    from:"Subscriber",
+                    localField:"_id",
+                    foreignField:"subscriber",
+                    as:"subscribedTo"
+                }
+            },
+            {
+                $addFields:{
+                    subscriberCounts:{
+                        $size:"$subscribers"
+                    },
+                    channelSubscribedToCounts:{
+                        $size:"$subscribedTo"
+                    },
+                    isSubscribed:{
+                        $cond:{
+                            if:{$in:[req.user?._id,"$subscribers.subscriber"]},
+                            then:true,
+                            else:false
+                        }
+                    }
+                }
+            },
+            {
+                $project:{
+                    fullName:1,
+                    userName:1,
+                    subscriberCounts:1,
+                    channelSubscribedToCounts:1,
+                    isSubscribed:1,
+                    avatar:1,
+                    coverImage:1,
+                    email:1
+                }
+            }
+        ])
+        if(!channel.length){
+            res.status(400).send("channel do not exist")
+        }
+        return res.status(200).json({
+            channel,
+            message:"user channel found successfully!"
+        })
+
+    } catch (error) {
+        res.status(400)
+        .json({
+            message:"something went wrong!"
+        })
+    }
+})

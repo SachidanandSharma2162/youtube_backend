@@ -1,0 +1,20 @@
+Aggregation Pipelines:
+
+
+user: a,b,c,d,e
+channel: cac,hcc,fcc
+
+doc1:(cac,a)
+doc2:(hcc,b)
+doc3:(cac,c)
+doc4:(hcc,c)
+doc5:(fcc,c)
+
+
+agar chnannel chai aur code mil jata hai to, number of subscriber nikalne ke liye hame bass document count krna hoga isse hame ye pta chal jayega ki chai aur code ko kitne logo ne subscribe kia hai.
+
+channel ko select krne se subscriber milenge uss channel ke.
+
+yaha cac ke 2 docs hai to cac ke 2 subscriber ho gye hai.
+
+ab agar ye pta krna hai ki c ne kis kis ko subscribe kr kr rakha hai to, subscriber ke ander c ko find karo aur channel ko le lo.
