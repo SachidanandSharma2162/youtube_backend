@@ -16,7 +16,7 @@ const generateAccessAndRefreshToken = async (userId) => {
         throw error;
     }
 };
-module.exports.registerUser=asyncHandler(async (req,res)=>{
+ module.exports.registerUser=asyncHandler(async (req,res)=>{
     try {
         // take user input from the body
         // validate - not empty
@@ -179,3 +179,122 @@ module.exports.RefreshAccessToken=asyncHandler(async(req,res)=>{
     }
    
 })
+
+module.exports.changeUserPassword=asyncHandler(async(req,res)=>{
+    try {
+        console.log(req.body);
+        let {oldPassword,newPassword,confirmPassword}=req.body;
+        
+        if(newPassword!==confirmPassword){
+            return res.send("New Password and Confirm Password do not match!")
+        }
+        const user=await userModel.findById(req.user._id);
+        const isPasswordMatch=await user.isPasswordMatch(oldPassword)
+        if(!isPasswordMatch){
+            res.send("incorrect old password");
+        }
+        user.password=newPassword
+        await user.save({
+            validateBeforeSave:false
+        })
+        return res.status(201).send("Password changed successfully. You can now login!")
+    } catch (error) {
+        res.status(401).send(error.message)
+    }
+})
+
+module.exports.updateUserDetails=asyncHandler(async(req,res)=>{
+    try {
+        let {fullName,email}=req.body;
+
+        if(!fullName || !email){
+            return res.send("please fill out all fields!");
+        }
+        const user=await userModel.findByIdAndUpdate(req.user._id,{
+            $set:{
+                fullName,
+                email
+            }
+        },{
+            new:true
+        }
+).select("-password");
+    
+        return res.status(200).json({
+            user,
+            message:"Infomation updated successfully!"
+        })
+    } catch (error) {
+        res.status(401).json({
+            message:"something went worng, try again!"
+        })
+    }
+})
+
+module.exports.updateCoverImage = asyncHandler(async (req, res) => {
+    try {
+      let coverImage = req.file?.path;
+      if (!coverImage) {
+        return res.status(401).send("Please upload cover image!");
+      }
+  
+      const coverImageUpload = await uploadFileOnCloudinary(coverImage);
+      if (!coverImageUpload.url) {
+        return res.status(401).send("Error in uploading cover image");
+      }
+  
+      const updatedUser = await userModel.findByIdAndUpdate(
+        req.user._id,
+        {
+          $set: {
+            coverImage: coverImageUpload.url,
+          },
+        },
+        { new: true }
+      ).select("-password");
+  
+      res.status(200).json({
+        success: true,
+        message: "Cover image updated successfully!",
+        user: updatedUser,
+      });
+  
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Something went wrong while updating cover image, try again later!");
+    }
+  });
+module.exports.updateAvatar = asyncHandler(async (req, res) => {
+    try {
+      let localAvatar = req.file?.path;
+      if (!localAvatar) {
+        return res.status(401).send("Please upload Avatar!");
+      }
+  
+      const avatarUpload = await uploadFileOnCloudinary(localAvatar);
+      if (!avatarUpload.url) {
+        return res.status(401).send("Error in uploading cover image");
+      }
+  
+      const updatedUser = await userModel.findByIdAndUpdate(
+        req.user._id,
+        {
+          $set: {
+            avatar: avatarUpload.url,
+          },
+        },
+        { new: true }
+      ).select("-password");
+  
+      res.status(200).json({
+        success: true,
+        message: "Avatar updated successfully!",
+        user: updatedUser,
+      });
+  
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("Something went wrong while updating avatar, try again later!");
+    }
+  });
+  

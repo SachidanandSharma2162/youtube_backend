@@ -1,7 +1,15 @@
 var express = require('express');
 var router = express.Router();
 var {isLoggedIn}=require('../middlewares/isLoggedIn') 
-var {registerUser, loginUser,logoutUser, RefreshAccessToken}=require('../controllers/authController');
+var {
+  registerUser, 
+  loginUser,
+  logoutUser, 
+  RefreshAccessToken, 
+  changeUserPassword, 
+  updateUserDetails, 
+  updateCoverImage,
+  updateAvatar}=require('../controllers/authController');
 const upload = require('../middlewares/multerConfig');
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -23,6 +31,10 @@ router.post('/register',upload.fields([
 
 router.post('/login', loginUser)
 router.get('/logout', isLoggedIn, logoutUser)
+router.post('/change-password',isLoggedIn,changeUserPassword);
+router.post('/update-user',isLoggedIn,updateUserDetails);
 router.post('/refresh-token',RefreshAccessToken)
+router.post('/change-coverimage',upload.single("coverImage"),isLoggedIn,updateCoverImage);
+router.post("/change-avatar",upload.single("avatar"),isLoggedIn,updateAvatar)
 module.exports = router;
  
