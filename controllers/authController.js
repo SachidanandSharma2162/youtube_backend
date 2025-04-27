@@ -16,6 +16,7 @@ const generateAccessAndRefreshToken = async (userId) => {
         throw error;
     }
 };
+
  module.exports.registerUser=asyncHandler(async (req,res)=>{
     try {
         // take user input from the body
@@ -146,6 +147,7 @@ module.exports.logoutUser=asyncHandler(async (req,res)=>{
         
     }
 })
+
 module.exports.RefreshAccessToken=asyncHandler(async(req,res)=>{
     try {
         const incomingRefreshToken=req.cookie.refreshToken;
@@ -264,6 +266,7 @@ module.exports.updateCoverImage = asyncHandler(async (req, res) => {
       res.status(500).send("Something went wrong while updating cover image, try again later!");
     }
   });
+
 module.exports.updateAvatar = asyncHandler(async (req, res) => {
     try {
       let localAvatar = req.file?.path;
@@ -296,5 +299,4 @@ module.exports.updateAvatar = asyncHandler(async (req, res) => {
       console.error(error);
       res.status(500).send("Something went wrong while updating avatar, try again later!");
     }
-  });
-  
+});
