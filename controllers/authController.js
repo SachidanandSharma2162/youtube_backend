@@ -411,7 +411,7 @@ module.exports.getUserHistory=asyncHandler(async(req,res)=>{
         }
     ])
     return res.status(200).json({
-        watchHistory:user[0].watchHistory,
+        data:user.watchHistory,
         message:"User History Fetched Successfully"
     })
 })
