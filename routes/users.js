@@ -10,7 +10,8 @@ var {
   updateUserDetails, 
   updateCoverImage,
   updateAvatar,
-  getUserChannelProfile}=require('../controllers/authController');
+  getUserChannelProfile,
+  getUserHistory}=require('../controllers/authController');
 const upload = require('../middlewares/multerConfig');
 /* GET users listing. */
 router.get('/', function(req, res, next) {
@@ -38,5 +39,6 @@ router.post('/refresh-token',RefreshAccessToken)
 router.post('/change-coverimage',upload.single("coverImage"),isLoggedIn,updateCoverImage);
 router.post("/change-avatar",upload.single("avatar"),isLoggedIn,updateAvatar)
 router.get("/profile",isLoggedIn,getUserChannelProfile);
+router.get("/history",isLoggedIn,getUserHistory);
 module.exports = router;
  

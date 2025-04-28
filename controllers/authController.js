@@ -3,6 +3,7 @@ const jwt=require('jsonwebtoken');
 const userModel=require('../models/userModel');
 const {asyncHandler}=require('../utils/asyncHandler');
 const {uploadFileOnCloudinary}=require('../utils/cloudinary');
+const { default: mongoose } = require('mongoose');
 
 const generateAccessAndRefreshToken = async (userId) => {
     try {
@@ -371,3 +372,46 @@ module.exports.getUserChannelProfile = asyncHandler(async (req, res) => {
     return res.status(500).json({ message: "something went wrong!" });
   }
 });
+
+module.exports.getUserHistory=asyncHandler(async(req,res)=>{
+    const user=userModel.aggregate([
+        {
+            $match:{
+                _id:new mongoose.Types.ObjectId(req.user._id)
+            }
+        },
+        {
+            $lookup:{
+                from:"Video",
+                localField:"watchHistory",
+                foreignField:"_id",
+                as:"watchHistory",
+                pipeline:[{
+                    $lookup:{
+                        from:"User",
+                        localField:"owner",
+                        foreignField:"_id",
+                        as:"owner",
+                        pipeline:[{
+                            $project:{
+                                fullName:1,
+                                userName:1,
+                                avatar:1
+                            }
+                        }]
+                    }
+                },{
+                    $addFields:{
+                        owner:{
+                            $first:"$owner"
+                        }
+                    }
+                }]
+            }
+        }
+    ])
+    return res.status(200).json({
+        watchHistory:user[0].watchHistory,
+        message:"User History Fetched Successfully"
+    })
+})
