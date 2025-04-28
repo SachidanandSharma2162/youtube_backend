@@ -62,7 +62,7 @@ GET   /history  Get user history
 
 🔥 Getting Started
 1. Clone the repository:
-git clone https://github.com/SharmaSachidanand2162/youtube_backend.git
+git clone https://github.com/SachidanandSharma2162/youtube_backend.git
 cd suuno-backend
 2. Install dependencies:
 npm install
