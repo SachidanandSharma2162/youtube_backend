@@ -401,7 +401,7 @@ module.exports.getUserChannelProfile = asyncHandler(async (req, res) => {
 });
 
 module.exports.getUserHistory = asyncHandler(async (req, res) => {
-  const user = userModel.aggregate([
+  const user =await userModel.aggregate([
     {
       $match: {
         _id: new mongoose.Types.ObjectId(req.user._id),
@@ -443,7 +443,7 @@ module.exports.getUserHistory = asyncHandler(async (req, res) => {
     },
   ]);
   return res.status(200).json({
-    data: user.watchHistory,
+    data: user[0].watchHistory,
     message: "User History Fetched Successfully",
   });
 });
